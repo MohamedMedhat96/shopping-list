@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +30,8 @@ public class ReportService {
 	private CategoryRepository categoryRepo;
 	@Autowired
 	private ItemRepository itemRepo;
-
+	@Autowired
+	private SessionFactory sessionFactory;
 	@Autowired
 	private OperationRepository operationRepo;
 
@@ -40,8 +43,11 @@ public class ReportService {
 	 * @throws IncorrectInputException
 	 */
 	public ReportDTO getReport(ObjectNode json) throws IncorrectInputException {
-
+			//TODO Done and tested! edit report
 		// Begins validations and Parsing
+		
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
 		int categoryId;
 		int itemId;
 		String stringStartDate;
@@ -75,76 +81,27 @@ public class ReportService {
 			if (!stringEndDate.equals(""))
 				endDate = new SimpleDateFormat("dd-MM-yyyy").parse(stringEndDate);
 		} catch (ParseException e) {
+			session.getTransaction().rollback();
 			throw new IncorrectInputException("The date format was not correct", e);
+		}
+		finally {
+			
+			session.close();
+			
 		}
 		List<OperationModel> currentOperations = new ArrayList<OperationModel>();
 
-		List<ItemModel> currentItems = new ArrayList<ItemModel>();
-		if (categoryId != -1 && itemId == -1) {
-			// System.out.println(categoryId);
-			System.out.println(startDate + " " + endDate);
-			// System.out.println(current.getId());
-			currentItems.addAll(itemRepo.getItemByCatId(categoryId));
+		try {
+		currentOperations=	operationRepo.getOperationsCustom(itemId,categoryId,startDate,endDate,session);
+		}catch(Exception e)
+		{	session.getTransaction().rollback();
+			throw e;
 		}
-		if (itemId != -1) {
-
-			currentItems.add(itemRepo.getItemNoFilter(itemId));
-
+		finally {
+		
+			session.close();
+			
 		}
-		if (!currentItems.isEmpty()) {
-			for (int i = 0; i < currentItems.size(); i++) {
-				// System.out.println(currentItems.get(i).getId());
-				currentOperations.addAll(operationRepo.getOperationsByItem(currentItems.get(i)));
-
-			}
-
-		}
-
-		if (!currentOperations.isEmpty()) { // If three or more fields are specified
-			List<OperationModel> updatedList = new ArrayList<>();
-			if (startDate != null && endDate != null) {
-				for (int i = 0; i < currentOperations.size(); i++) {
-					updatedList.addAll(operationRepo.getOperationsByDateAndItemId(currentOperations.get(i).getId(),
-							startDate, endDate));
-				}
-			} else {
-				if (startDate != null) {
-
-					for (int i = 0; i < currentOperations.size(); i++) {
-						System.out.println(new Date());
-						updatedList.addAll(operationRepo.getOperationsByDateAndItemId(currentOperations.get(i).getId(),
-								startDate, new Date()));
-
-					}
-				} else {
-					if (endDate != null)
-						for (int i = 0; i < currentOperations.size(); i++) {
-							System.out.println(currentOperations.get(i).getDateOfOperation().toLocaleString());
-							updatedList.addAll(operationRepo.getOperationsByDateAndItemId(
-									currentOperations.get(i).getId(), operationRepo.getOldestDate(), endDate));
-
-						}
-				}
-			}
-			currentOperations = updatedList;
-		} else { // if only the dates are specified
-			if (startDate != null && endDate != null) {
-				currentOperations = operationRepo.getOperationsByDate(startDate, endDate);
-				startDate = null;
-				endDate = null;
-			}
-			if (endDate != null) {
-				Date oldestDate = operationRepo.getOldestDate();
-
-				currentOperations = operationRepo.getOperationsByDate(oldestDate, endDate);
-
-			}
-			if (startDate != null)
-				currentOperations = operationRepo.getOperationsByDate(startDate, new Date());
-		}
-
-		// End validation and parsing above
-
 		ReportDTO output = new ReportDTO(currentOperations, "done", 200);
 		return output;
 

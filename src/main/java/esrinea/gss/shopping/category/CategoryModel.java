@@ -14,38 +14,36 @@ import javax.validation.constraints.NotEmpty;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-/** A Model Class representing a single Category*/
+/** A Model Class representing a single Category */
 
 @JsonInclude(Include.NON_NULL)
-@Entity(name="category")
+@Entity(name = "category")
 public class CategoryModel {
 
 	@Id
-	@Column(name="category_id")
+	@Column(name = "category_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	@NotEmpty
-	@Column(name="category_name",unique =true, nullable = false,length = 50)
+	@NotEmpty(message = "Name Cannot be Empty")
+	@Column(name = "category_name", unique = true, nullable = false, length = 50)
 	private String name;
-	@NotEmpty(message="Name Cannot be Empty")
-	@Column(name="category_description",length = 250)
-	@NotEmpty(message="Discreption Cannot be Empty")
+	@Column(name = "category_description", length = 250)
+	@NotEmpty(message = "Description Cannot be Empty")
 	private String description;
-	@Column(name="created_date")
+	@Column(name = "created_date")
 	private final Date dateCreated = new Date();
 
-	@Column(name="deleted")
+	@Column(name = "deleted")
 	private boolean deleted = false;
-	@Column(name="last_updated")
+	@Column(name = "last_updated")
 	private Date lastUpdated;
-	@Column(name="deleted_date")
+	@Column(name = "deleted_date")
 	private Date deletedDate;
-	
-	
-	
+
 	public Date getLastUpdated() {
 		return lastUpdated;
 	}
+
 	public Date getDeletedDate() {
 		return deletedDate;
 	}
@@ -53,16 +51,20 @@ public class CategoryModel {
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
 	}
+
 	public void setLastUpdated(Date lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
+
 	public void setDeletedDate(Date deletedDate) {
 		this.deletedDate = deletedDate;
 	}
+
 	public Date getDateCreated() {
 		return dateCreated;
-		
+
 	}
+
 	public int getId() {
 		return id;
 	}
@@ -87,5 +89,4 @@ public class CategoryModel {
 		this.description = description;
 	}
 
-	
 }

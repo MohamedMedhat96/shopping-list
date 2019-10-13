@@ -16,13 +16,14 @@ import esrinea.gss.general.DatabaseSessionFactory;
 import esrinea.gss.general.exceptions.CategoryNotFoundException;
 import esrinea.gss.general.exceptions.IncorrectInputException;
 import esrinea.gss.general.exceptions.ItemNotFoundException;
+import esrinea.gss.shopping.item.ItemModel;
 
-/**A category repository that is used to access the database for category related database operations.*/
+/**
+ * A category repository that is used to access the database for category
+ * related database operations.
+ */
 @Repository
 public class CategoryRepository {
-
-	@Autowired
-	private SessionFactory sessionFactory;
 
 	public CategoryRepository() {
 
@@ -30,117 +31,121 @@ public class CategoryRepository {
 
 	/**
 	 * A method used to get a single category from the database
+	 * 
 	 * @param id The id of the category needed to be retrieved
 	 * @return category The category that is retrieved from the database
-	 * */
-	public CategoryModel getACategory(int id) throws CategoryNotFoundException {
-		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		CategoryModel category = null;
-		try {
-			category = (CategoryModel) session.createNativeQuery(
-					"select * from category where category.deleted = false and category.category_id = " + id,
-					CategoryModel.class).list().get(0); // getting all the categories that are not deleted
-		} catch (IndexOutOfBoundsException e) {
-			throw new CategoryNotFoundException("the category", e);
-		} finally {
-			session.close();
-		}
-		return category;
-	}
+	 */
+	public CategoryModel getACategory(int id, Session session) throws CategoryNotFoundException {
 
+		CategoryModel category = null;
+
+		List<CategoryModel> categoryList = session.createNativeQuery(
+				"select * from category where category.deleted = false and category.category_id = " + id,
+				CategoryModel.class).list(); // getting all the categories that are not deleted
+
+		if (categoryList.size() == 0)
+			throw new CategoryNotFoundException("the category", new Exception());
+		else
+			return category;
+
+	}
 
 	/**
 	 * A method used to get all categories from the database
-	 * @return List<CategoryModel>  of the categories that is retrieved from the database
-	 * */
-	public List<CategoryModel> getAllCategories() {
-		Session session = this.sessionFactory.openSession();
-		session.beginTransaction();
+	 * 
+	 * @return List<CategoryModel> of the categories that is retrieved from the
+	 *         database
+	 */
+	public List<CategoryModel> getAllCategories(Session session) {
+	
 		List<CategoryModel> categoryModelData = session
 				.createNativeQuery("select * from category where category.deleted=false", CategoryModel.class).list();
-		session.close();
 		return categoryModelData;
 	}
 
-
-	/** Adding a category to the database
+	/**
+	 * Adding a category to the database
+	 * 
 	 * @param category
 	 * 
 	 */
-	public CategoryModel addCategory(CategoryModel category) throws IncorrectInputException {
-		Session session = sessionFactory.openSession();
+	public CategoryModel addCategory(CategoryModel category, Session session) throws IncorrectInputException {
+		// Done TODO handle hibernate session management in service layers instead
+		
 
-		session.beginTransaction();
-
-		try {
-			session.save(category);
-			session.getTransaction().commit();
-		} catch (PersistenceException e) {
-			session.getTransaction().rollback();
-			throw new IncorrectInputException("The name is not unique", e);
-		} catch (javax.validation.ConstraintViolationException e) {
-			throw new IncorrectInputException("Data cannot be empty", e);
-		} finally {
-			session.close();
-		}
+	List<CategoryModel> cat = session.createNativeQuery("select * from item where item.item_id=" + category.getId(), CategoryModel.class).list();
+		if(cat.size()>0)
+			session.save(cat);
+		else
+			throw new IncorrectInputException("The name is not unique", new Exception());
+		
+		
 		return category;
 
 	}
 
 	/**
 	 * Editing a Category inside the Database.
-	 * @param id Id of the new Category
-	 * @param name The new name
+	 * 
+	 * @param id          Id of the new Category
+	 * @param name        The new name
 	 * @param description The new Description
 	 * @throws IncorrectInputException
 	 */
 
-	public void editCategory(int id, String name, String description) throws IncorrectInputException {
-		Session session = this.sessionFactory.openSession();
-		session.beginTransaction();
-
+	public void editCategory(int id, String name, String description, Session session) throws IncorrectInputException {
+		
 		CategoryModel currentCategory = null;
 		try {
-			currentCategory = this.getACategory(id);
+			currentCategory = this.getACategory(id, session);
 		} catch (IncorrectInputException e) {
-			session.close();
+			
 			throw e;
 		}
 		currentCategory.setName(name);
 		currentCategory.setDescription(description);
 		currentCategory.setLastUpdated(new Date());
 		session.update(currentCategory);
-		session.getTransaction().commit();
-		session.close();
+	
 
 	}
-	
+
 	/**
 	 * Deleting a category of the database.
+	 * 
 	 * @param id The ID of the category you want to delete
 	 * @throws IncorrectInputException
 	 */
-	public void deleteCategory(int id) throws IncorrectInputException {
+	public void deleteCategory(int id, Session session) throws IncorrectInputException {
 
-		Session session = this.sessionFactory.openSession();
-		session.beginTransaction();
+		
 		CategoryModel currentCategory = null;
 		try {
-			currentCategory = this.getACategory(id);
+			currentCategory = this.getACategory(id, session);
 		} catch (IncorrectInputException e) {
-			session.close();
+
 			throw e;
 		}
 		currentCategory.setDeleted(true);
 		currentCategory.setLastUpdated(new Date());
 		currentCategory.setDeletedDate(new Date());
 		session.update(currentCategory);
-		session.getTransaction().commit();
-		session.close();
-
-	}
 	
 
+	}
+
+	public CategoryModel getACategoryNoFilter(int categoryId, Session session) {
+		
+		CategoryModel category = null;
+		try {
+			category = (CategoryModel) session
+					.createNativeQuery("select * from category where  category.category_id = " + categoryId,
+							CategoryModel.class)
+					.list().get(0); // getting all the categories that are not deleted
+		} catch (IndexOutOfBoundsException e) {
+			throw new CategoryNotFoundException("the category", e);
+		}
+		return category;
+	}
 
 }

@@ -19,9 +19,8 @@ import esrinea.gss.shopping.category.CategoryModel;
 @Repository
 public class ItemRepository {
 
-	@Autowired
-	private SessionFactory sessionFactory;
 
+	
 	public ItemRepository() {
 
 	}
@@ -31,14 +30,12 @@ public class ItemRepository {
 	 * 
 	 * @return List A list of all items in the database
 	 */
-	public List<ItemModel> getAllItems() {
-		Session session = sessionFactory.openSession();
-		session.beginTransaction();
+	public List<ItemModel> getAllItems(Session session) {
+		
 		List<ItemModel> currentItems = session.createNativeQuery(
 				"select * from item where item.deleted = false and item.category_id NOT IN (select category_id from category where category.deleted =true)",
 				ItemModel.class).list(); //Returning all items that are not deleted and their categories are also not deleted
 
-		session.close();
 		return currentItems;
 	}
 
@@ -46,21 +43,13 @@ public class ItemRepository {
 	 * Adding an item to the database.
 	 * @param item The item you need to add to the database.
 	 */
-	public void addItem(ItemModel item) throws IncorrectInputException {
-		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-
-		try {
+	public void addItem(ItemModel item, Session session) throws IncorrectInputException {
+		
+		List<ItemModel> items = session.createNativeQuery("select * from item where item.name == " + item.getName()).list();
+		if(items.size()>0)
+			throw new IncorrectInputException("Item name already exists", new Exception());
+		else
 			session.save(item);
-			session.getTransaction().commit();
-		} catch (PersistenceException e) {
-			session.getTransaction().rollback();
-			session.close();
-			throw new IncorrectInputException("The name is not unique", e);
-		}
-		finally {
-			session.close();	
-		}
 
 		
 	}
@@ -72,10 +61,9 @@ public class ItemRepository {
 	 * @param description The new Description of the item
 	 * @throws ItemNotFoundException
 	 */
-	public void editItem(CategoryModel category, int id, String name, String description) throws ItemNotFoundException {
+	public void editItem(CategoryModel category, int id, String name, String description, Session session) throws ItemNotFoundException {
 
-		Session session = sessionFactory.openSession();
-		session.beginTransaction();
+		
 		try {
 			ItemModel currentItem = session.get(ItemModel.class, id);
 			// currentItem.setAmount(amount);
@@ -84,14 +72,9 @@ public class ItemRepository {
 			currentItem.setCategory(category);
 			currentItem.setLastUpdated(new Date());
 			session.update(currentItem);
-			session.getTransaction().commit();
-		} catch (Exception e) {
-			session.getTransaction().rollback();
+			} catch (Exception e) {
 			throw new ItemNotFoundException("The item", e);
-		} finally {
-
-			session.close();
-		}
+		} 
 	}
 
 	/**
@@ -99,10 +82,9 @@ public class ItemRepository {
 	 * @param id The id of the Item you want to delete form the database
 	 * @throws ItemNotFoundException
 	 */
-	public void deleteItem(int id) throws ItemNotFoundException {
+	public void deleteItem(int id, Session session) throws ItemNotFoundException {
 
-		Session session = sessionFactory.openSession();
-		session.beginTransaction();
+		
 		try {
 			ItemModel currentItem = session.get(ItemModel.class, id);
 			currentItem.setDeleted(true);
@@ -111,11 +93,8 @@ public class ItemRepository {
 			session.update(currentItem);
 			session.getTransaction().commit();
 		} catch (Exception e) {
-			throw new ItemNotFoundException("", e);
-		} finally {
-			session.close();
-
-		}
+			throw new ItemNotFoundException("The item", e);
+		} 
 
 	}
 	/**
@@ -124,22 +103,22 @@ public class ItemRepository {
 	 * @return List of all items related to the specified category
 	 */
 
-	public List<ItemModel> getItemByCatId(int id) {
-		Session session = sessionFactory.openSession();
-		session.beginTransaction();
+	public List<ItemModel> getItemByCatId(int id, Session session) {
+		
 		List<ItemModel> data = session
 				.createNativeQuery("select * from item where item.category_id=" + id, ItemModel.class).list();
-		session.close();
+		
 		return data;
 	}
 
 	/**
 	 * Getting a specific item by its item ID
 	 * @param id The id of the Item you want to retrieve
+	 * @param session2 
 	 * @return
 	 */
-	public ItemModel getItem(int id) {
-		Session session = sessionFactory.openSession();
+	public ItemModel getItem(int id, Session session) {
+		
 		session.beginTransaction();
 		ItemModel currentItem = null;
 		try {
@@ -149,9 +128,7 @@ public class ItemRepository {
 					.list().get(0);
 		} catch (IndexOutOfBoundsException e) {
 			throw new ItemNotFoundException("", e);
-		} finally {
-			session.close();
-		}
+		} 
 		return currentItem;
 	}
 	/**
@@ -159,20 +136,26 @@ public class ItemRepository {
 	 * @param id the ID of the item you want to return
 	 * @return Item the Item you need.
 	 */
-	public ItemModel getItemNoFilter(int id) {
-		Session session = sessionFactory.openSession();
-		session.beginTransaction();
-		ItemModel currentItem = session
-				.createNativeQuery("select * from item where item.item_id=" + id, ItemModel.class).list().get(0);
-		session.close();
+	public ItemModel getItemNoFilter(int id, Session session) {
+	
+		ItemModel currentItem;
+		List<ItemModel> currentItems = session
+				.createNativeQuery("select * from item where item.item_id=" + id, ItemModel.class).list();
+		if(currentItems.size()>0)
+			 currentItem = currentItems.get(0);
+		else
+		{
+			 currentItem = null;
+			throw new ItemNotFoundException("Item not found", new Exception());
+		}
 		return currentItem;
 	}
 
-	public void editItem(ItemModel currentItem) {
-		Session session = sessionFactory.openSession();
+	public void editItem(ItemModel currentItem, Session session) {
+		
+	
 		session.update(currentItem);
-		session.getTransaction().commit();
-		session.close();
+		
 		
 	}
 }

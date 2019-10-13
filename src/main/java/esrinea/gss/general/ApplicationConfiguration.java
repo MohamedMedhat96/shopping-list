@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
@@ -21,6 +22,14 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 //Configuration Class to configure the database session factory and it's configurations as a bean.
 @Configuration
 public class ApplicationConfiguration {
+	@Value("${spring.datasource.url}")
+    private String jdbcURl;
+
+@Value("${spring.datasource.username}")
+    private String dbUsername;
+
+@Value("${spring.datasource.password}")
+    private String dbPassword;
 
 //Creating the session factory bean
 	@Bean
@@ -37,11 +46,12 @@ public class ApplicationConfiguration {
 	//returns the database properties
 	@Bean
 	public DataSource dataSource() {
+		// TODO Done! Configure the DB URL, credentials, etc... as entries in .properties file
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName("org.postgresql.Driver");
-		dataSource.setUrl("jdbc:postgresql://localhost:5432/stock_system_db");
-		dataSource.setUsername("postgres");
-		dataSource.setPassword("kokykoky");
+		dataSource.setUrl(this.jdbcURl);
+		dataSource.setUsername(this.dbUsername);
+		dataSource.setPassword(this.dbPassword);
 
 		return dataSource;
 	}

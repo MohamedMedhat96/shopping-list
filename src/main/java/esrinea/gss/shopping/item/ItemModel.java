@@ -112,5 +112,23 @@ public class ItemModel {
 	public Date getDateCreated() {
 		return dateCreated;
 	}
+	
+	@Override
+    public boolean equals(Object o) { 
+  
+        if (o == this) { 
+            return true; 
+        } 
+  
+        if (!(o instanceof ItemModel)) { 
+            return false; 
+        } 
+          
+        // typecast o to Complex so that we can compare data members  
+        ItemModel c = (ItemModel) o; 
+          
+        // Compare the data members and return accordingly  
+        return c.getId() == this.getId();
+    } 
 
 }

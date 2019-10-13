@@ -18,7 +18,7 @@ public class OperationDTO<T> {
 		code = i;
 	}
 	public OperationDTO() {
-		// TODO Auto-generated constructor stub
+	
 	}
 	public T getData() {
 		return data;
