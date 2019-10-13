@@ -33,7 +33,7 @@ public class OperationService {
 
 	public OperationDTO issueOperation(ObjectNode json) throws IncorrectInputException {
 		
-		// TODO Adjust session handling and (done)test with operation issuing 
+		// TODO Done Adjust session handling and (done)test with operation issuing 
 		
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();

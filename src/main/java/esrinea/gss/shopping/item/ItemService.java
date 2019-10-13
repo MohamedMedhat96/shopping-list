@@ -21,6 +21,7 @@ import esrinea.gss.shopping.category.CategoryRepository;
 @Service
 public class ItemService {
 
+	private static final String descrpition = null;
 	@Autowired
 	private ItemRepository itemRepo;
 	@Autowired
@@ -161,25 +162,24 @@ public class ItemService {
 		String name = null;
 		String description = null;
 
-		try {
+		if(!json.hasNonNull("categoryId"))
+			throw new IncorrectInputException("categoryId cannot be empty",new Exception());
+		else
 			categoryId = json.get("categoryId").asInt();
-		} catch (NullPointerException e) {
-			throw new IncorrectInputException("categoryId", e);
-		}
-		try {
+		
+		if(!json.hasNonNull("name"))
+			throw new IncorrectInputException("name cannot be empty",new Exception());
+		else
 			name = json.get("name").asText();
-
-		} catch (NullPointerException e) {
-			throw new IncorrectInputException("name not found", e);
-
-		}
-		try {
+		
+		if(!json.hasNonNull("description"))
+			throw new IncorrectInputException("description cannot be empty",new Exception());
+		else
 			description = json.get("description").asText();
-		} catch (NullPointerException e) {
-			throw new IncorrectInputException("description not found", e);
-		}
+		
+		
 		Pattern regex = Pattern.compile("[$&+,:;=\\\\?@#|/'<>.^*()%!-]");
-		if (regex.matcher(name).find() || regex.matcher(description).find()) {
+		if (regex.matcher(name).find() || regex.matcher(description).find() || name.isEmpty() || descrpition.isEmpty()) {
 			throw new IncorrectInputException("Data cannot contain special characters", new Exception());
 		}
 

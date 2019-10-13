@@ -70,7 +70,7 @@ public class CategoryRepository {
 	 * 
 	 */
 	public CategoryModel addCategory(CategoryModel category, Session session) throws IncorrectInputException {
-		// Done TODO handle hibernate session management in service layers instead
+		// Done TODO Done handle hibernate session management in service layers instead
 		
 
 	List<CategoryModel> cat = session.createNativeQuery("select * from item where item.item_id=" + category.getId(), CategoryModel.class).list();
