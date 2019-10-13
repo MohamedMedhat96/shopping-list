@@ -14,15 +14,19 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import esrinea.gss.general.Response;
 
-//An exception handler for the whole application, the handler extends Spring's ResponseEntityExceptionHandler 
-//and it is treated as a spring controller advice
+/**
+ * An exception handler for the whole application, the handler extends Spring's
+ * ResponseEntityExceptionHandler and it is treated as a spring controller advice
+ */
+
 @PropertySource("classpath:httpmessages.properties")
 @ControllerAdvice
 public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler {
 	@Autowired
 	private Environment env;
 
-	//Handler for Incorrect Input Exceptions, the details of the exact exception is explained inside the exception file
+	// Handler for Incorrect Input Exceptions, the details of the exact exception is
+	// explained inside the exception file
 	@ExceptionHandler(value = { IncorrectInputException.class })
 	protected ResponseEntity<Object> incorrectInput(RuntimeException ex, WebRequest request) {
 		Response response = new Response();
@@ -32,7 +36,9 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 		response.setMessage(message + ": " + ex.getMessage());
 		return new ResponseEntity<>(response, HttpStatus.valueOf(code));
 	}
-	//Handler for Items and Categories Not Found Exceptions, the details of the exact exception is explained inside the exception file
+
+	// Handler for Items and Categories Not Found Exceptions, the details of the
+	// exact exception is explained inside the exception file
 	@ExceptionHandler(value = { ItemNotFoundException.class, CategoryNotFoundException.class })
 	protected ResponseEntity<Object> itemNotFound(RuntimeException ex, WebRequest request) {
 		Response response = new Response();
