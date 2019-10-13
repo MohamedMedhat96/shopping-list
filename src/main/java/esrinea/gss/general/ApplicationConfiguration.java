@@ -18,55 +18,56 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
+//Configuration Class to configure the database session factory and it's configurations as a bean.
 @Configuration
 public class ApplicationConfiguration {
-		
 
-    @Bean
-    public LocalSessionFactoryBean sessionFactory() {
-        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-        sessionFactory.setDataSource(dataSource());
-        sessionFactory.setPackagesToScan(new String[] {"esrinea.gss.shopping.category","esrinea.gss.shopping.item","esrinea.gss.shopping.operation","esrinea.gss.shopping.report"});
-        sessionFactory.setHibernateProperties(hibernateProperties());
+//Creating the session factory bean
+	@Bean
+	public LocalSessionFactoryBean sessionFactory() {
+		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
+		sessionFactory.setDataSource(dataSource()); // Adding the data source properties.
+		sessionFactory.setPackagesToScan(new String[] { "esrinea.gss.shopping.category", "esrinea.gss.shopping.item",
+				"esrinea.gss.shopping.operation", "esrinea.gss.shopping.report" }); // base packages to be scanned
+		sessionFactory.setHibernateProperties(hibernateProperties()); // Hibernate properties and configurations
 
-        return sessionFactory;
-    }
+		return sessionFactory;
+	}
+	
+	//returns the database properties
+	@Bean
+	public DataSource dataSource() {
+		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName("org.postgresql.Driver");
+		dataSource.setUrl("jdbc:postgresql://localhost:5432/stock_system_db");
+		dataSource.setUsername("postgres");
+		dataSource.setPassword("kokykoky");
 
-    @Bean
-    public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/stock_system_db");
-        dataSource.setUsername("postgres");
-        dataSource.setPassword("kokykoky");
-        
-       
+		return dataSource;
+	}
 
-        return dataSource;
-    }
+	@Bean
+	@Autowired
+	public HibernateTransactionManager transactionManager(SessionFactory sessionFactory) {
 
-    @Bean
-    @Autowired
-    public HibernateTransactionManager transactionManager(SessionFactory sessionFactory) {
+		HibernateTransactionManager txManager = new HibernateTransactionManager();
+		txManager.setSessionFactory(sessionFactory);
 
-        HibernateTransactionManager txManager = new HibernateTransactionManager();
-        txManager.setSessionFactory(sessionFactory);
-     
+		return txManager;
+	}
 
-        return txManager;
-    }
+	@Bean
+	public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
+		return new PersistenceExceptionTranslationPostProcessor();
+	}
 
-    @Bean
-    public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
-        return new PersistenceExceptionTranslationPostProcessor();
-    }
-
-    Properties hibernateProperties() {
-        Properties properties = new Properties();
-        properties.setProperty("hibernate.ddl-auto", "update");
-        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
-        properties.setProperty("hibernate.connection.pool_size", "10");
-        properties.setProperty("hibernate.show_sql", "true");	
-        return properties;
-    }
+	//Hibernate Properties
+	Properties hibernateProperties() {
+		Properties properties = new Properties();
+		properties.setProperty("hibernate.ddl-auto", "update");
+		properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+		properties.setProperty("hibernate.connection.pool_size", "10");
+		properties.setProperty("hibernate.show_sql", "true");
+		return properties;
+	}
 }

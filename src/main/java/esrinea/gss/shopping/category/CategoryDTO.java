@@ -6,8 +6,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 
-
-
+/**
+A generic Category Response, with the Data being sent, a Success message and a Success code.
+*/
 @JsonInclude(Include.NON_NULL)
 public class CategoryDTO<T> {
 	

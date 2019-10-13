@@ -13,6 +13,9 @@ import javax.validation.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+/** A Model Class representing a single Category*/
+
 @JsonInclude(Include.NON_NULL)
 @Entity(name="category")
 public class CategoryModel {

@@ -16,7 +16,7 @@ public class Application {
 	
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
-		//java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
+
 	
 	}
 

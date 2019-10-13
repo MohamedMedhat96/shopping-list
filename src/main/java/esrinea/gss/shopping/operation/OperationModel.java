@@ -11,13 +11,23 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import esrinea.gss.shopping.item.ItemModel;
 
 @Entity(name = "operation")
+@JsonInclude(Include.NON_NULL)
+
+/**
+ * A model class to represent the operation
+ *
+ */
 public class OperationModel {
 
 	@Id
-	@Column(name = "operation_id", insertable = false)
+	@Column(name = "operation_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	@ManyToOne
 	@JoinColumn(name = "item_id")

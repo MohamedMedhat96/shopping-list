@@ -14,8 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-
-import esrinea.gss.general.exceptions.IncorrectInput;
+import esrinea.gss.general.exceptions.IncorrectInputException;
 import esrinea.gss.shopping.category.CategoryModel;
 import esrinea.gss.shopping.category.CategoryRepository;
 import esrinea.gss.shopping.item.ItemModel;
@@ -30,12 +29,19 @@ public class ReportService {
 	@Autowired
 	private ItemRepository itemRepo;
 
-	
 	@Autowired
 	private OperationRepository operationRepo;
 
-	public ReportDTO getReport(ObjectNode json) throws IncorrectInput {
+	/**
+	 * 
+	 * @param json A JSON file containing the criteria you want. itemId, categoryId,
+	 *             startDate and/or endDate (All fields are optional)
+	 * @return JSON a JSON file with all operations that fit the the criteria
+	 * @throws IncorrectInputException
+	 */
+	public ReportDTO getReport(ObjectNode json) throws IncorrectInputException {
 
+		// Begins validations and Parsing
 		int categoryId;
 		int itemId;
 		String stringStartDate;
@@ -69,7 +75,7 @@ public class ReportService {
 			if (!stringEndDate.equals(""))
 				endDate = new SimpleDateFormat("dd-MM-yyyy").parse(stringEndDate);
 		} catch (ParseException e) {
-			throw new IncorrectInput("Please Enter a Correct Value", e);
+			throw new IncorrectInputException("The date format was not correct", e);
 		}
 		List<OperationModel> currentOperations = new ArrayList<OperationModel>();
 
@@ -93,7 +99,8 @@ public class ReportService {
 			}
 
 		}
-		if (!currentOperations.isEmpty()) {
+
+		if (!currentOperations.isEmpty()) { // If three or more fields are specified
 			List<OperationModel> updatedList = new ArrayList<>();
 			if (startDate != null && endDate != null) {
 				for (int i = 0; i < currentOperations.size(); i++) {
@@ -120,7 +127,7 @@ public class ReportService {
 				}
 			}
 			currentOperations = updatedList;
-		} else {
+		} else { // if only the dates are specified
 			if (startDate != null && endDate != null) {
 				currentOperations = operationRepo.getOperationsByDate(startDate, endDate);
 				startDate = null;
@@ -134,11 +141,11 @@ public class ReportService {
 			}
 			if (startDate != null)
 				currentOperations = operationRepo.getOperationsByDate(startDate, new Date());
-//		System.out.println(currentOperations.get(0).equals(currentOperations.get(currentOperations.size()-1)));
 		}
-		System.out.println("test");
-		//currentOperations = currentOperations.stream().distinct().collect(Collectors.toList());
-		ReportDTO output = new ReportDTO(currentOperations,"done",200);
+
+		// End validation and parsing above
+
+		ReportDTO output = new ReportDTO(currentOperations, "done", 200);
 		return output;
 
 	}

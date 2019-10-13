@@ -1,5 +1,12 @@
 package esrinea.gss.shopping.operation;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+/**
+ * A class representing the output of the operation with the Data being the data sent, and message and code are the succes message and codes
+ */
+@JsonInclude(value = Include.NON_NULL)
 public class OperationDTO<T> {
 	
 	private T data;

@@ -20,6 +20,7 @@ import esrinea.gss.shopping.category.CategoryModel;
 
 @JsonInclude(Include.NON_NULL)
 @Entity(name = "item")
+/** A Model class that repersents an Item*/
 public class ItemModel {
 	@Id
 	@Column(name = "item_id")

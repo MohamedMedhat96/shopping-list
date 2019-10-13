@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
+
+/** 
+ A JSON format for all reports given the data, the message and the code
+ */
 public class ReportDTO<T>{
 	
 	private T data;
