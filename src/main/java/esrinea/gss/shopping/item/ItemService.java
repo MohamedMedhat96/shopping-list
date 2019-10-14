@@ -21,7 +21,6 @@ import esrinea.gss.shopping.category.CategoryRepository;
 @Service
 public class ItemService {
 
-	private static final String descrpition = null;
 	@Autowired
 	private ItemRepository itemRepo;
 	@Autowired
@@ -112,11 +111,8 @@ public class ItemService {
 		
 		}catch(Exception e) {
 			session.getTransaction().rollback();
-			
-			throw e;
-		}finally
-		{	
 			session.close();
+			throw e;
 		}
 
 		// Editing the item with the actual input
@@ -159,8 +155,8 @@ public class ItemService {
 	public ItemDTO editItem(int id, ObjectNode json) {
 		// Parsing and Validation STARTS below
 		int categoryId = -1;
-		String name = null;
-		String description = null;
+		String name = "";
+		String description = "";
 
 		if(!json.hasNonNull("categoryId"))
 			throw new IncorrectInputException("categoryId cannot be empty",new Exception());
@@ -179,7 +175,7 @@ public class ItemService {
 		
 		
 		Pattern regex = Pattern.compile("[$&+,:;=\\\\?@#|/'<>.^*()%!-]");
-		if (regex.matcher(name).find() || regex.matcher(description).find() || name.isEmpty() || descrpition.isEmpty()) {
+		if (regex.matcher(name).find() || regex.matcher(description).find() || name.isEmpty() || description.isEmpty()) {
 			throw new IncorrectInputException("Data cannot contain special characters", new Exception());
 		}
 
@@ -215,7 +211,7 @@ public class ItemService {
 	public ItemDTO getItem(int id) {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-		ItemModel currentItem = null;
+		ItemModel currentItem = new ItemModel();
 		try {
 			 currentItem = itemRepo.getItem(id, session);
 		} catch (Exception e) {

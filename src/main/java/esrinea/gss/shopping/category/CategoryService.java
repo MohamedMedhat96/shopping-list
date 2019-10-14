@@ -1,6 +1,7 @@
 package esrinea.gss.shopping.category;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -55,19 +56,23 @@ public class CategoryService {
 	 */
 	public CategoryDTO addCategory(CategoryModel category) {
 		// TODO Done! add validations
+		
+		System.out.println(category.getName());
+		if (category.getName() == null || category.getName().equals("")) {
+			
+			throw new IncorrectInputException("The name cannot be empty", new Exception());
+		}
+		if (category.getDescription() == null || category.getDescription().equals("")) {
+			
+			throw new IncorrectInputException("The description cannot be empty", new Exception());
+		}
+		
+		Pattern regex = Pattern.compile("[$&+,:;=\\\\?@#|/'<>.^*()%!-]");
+		if (regex.matcher(category.getName()).find() || regex.matcher(category.getDescription()).find()) {
+			throw new IncorrectInputException("Data cannot contain special characters", new Exception());
+		}
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
-		System.out.println(category.getName());
-		if (category.getName() == null) {
-			session.getTransaction().rollback();
-			session.close();
-			throw new IncorrectInputException("The name is incorrect", new Exception());
-		}
-		if (category.getDescription() == null) {
-			session.getTransaction().rollback();
-			session.close();
-			throw new IncorrectInputException("The description is incorrect", new Exception());
-		}
 		try {
 			category = categoryRepo.addCategory(category, session);
 			session.getTransaction().commit();
@@ -98,6 +103,20 @@ public class CategoryService {
 	public CategoryDTO editCategory(int id, String name, String description) {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
+		
+		if (name == null || name.equals("")) {
+			
+			throw new IncorrectInputException("The name cannot be empty", new Exception());
+		}
+		if (description == null ||description.equals("")) {
+			
+			throw new IncorrectInputException("The description cannot be empty", new Exception());
+		}
+		
+		Pattern regex = Pattern.compile("[$&+,:;=\\\\?@#|/'<>.^*()%!-]");
+		if (regex.matcher(name).find() || regex.matcher(description).find()) {
+			throw new IncorrectInputException("Data cannot contain special characters", new Exception());
+		}
 		try {
 			categoryRepo.editCategory(id, name, description, session);
 			session.getTransaction().commit();

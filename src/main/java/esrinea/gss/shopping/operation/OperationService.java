@@ -35,8 +35,7 @@ public class OperationService {
 		
 		// TODO Done Adjust session handling and (done)test with operation issuing 
 		
-		Session session = sessionFactory.openSession();
-		session.beginTransaction();
+		
 		if(!json.hasNonNull("itemId"))
 			throw new IncorrectInputException("Item Id cannot be empty", new Exception());
 	
@@ -52,12 +51,15 @@ public class OperationService {
 		
 		OperationModel currentOperation = new OperationModel();
 		currentOperation.setDateOfOperation((new Date()));
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
 		try {
 		ItemModel currentItem = itemRepo.getItem(itemId,session);
 		
+		
 		if (currentItem.getAmount() < quantity && operation == true)
-			new IncorrectInputException("Quantity is not enough to excute operation", new Exception());
-
+			throw new IncorrectInputException("Quantity is not enough to excute operation", new Exception());
+		
 		if (operation)
 			currentItem.setAmount(currentItem.getAmount() - quantity);
 		else
@@ -71,11 +73,17 @@ public class OperationService {
 		operationRepo.issueOperation(currentOperation,session);
 		session.getTransaction().commit();
 		}
+		catch(IncorrectInputException e)
+		{
+			session.getTransaction().rollback();
+			throw e;
+		}
 		catch(ItemNotFoundException e)
 		{
 			session.getTransaction().rollback();
 			throw e;
-		}finally {
+		}
+		finally {
 			
 			session.close();
 		}
@@ -84,5 +92,6 @@ public class OperationService {
 		output.setMessage("Operation Added");
 		output.setCode(200);
 		return output;
-	}
+		
+		}
 }

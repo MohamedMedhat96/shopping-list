@@ -46,7 +46,7 @@ public class CategoryRepository {
 		if (categoryList.size() == 0)
 			throw new CategoryNotFoundException("the category", new Exception());
 		else
-			return category;
+			return categoryList.get(0);
 
 	}
 
@@ -73,9 +73,9 @@ public class CategoryRepository {
 		// Done TODO Done handle hibernate session management in service layers instead
 		
 
-	List<CategoryModel> cat = session.createNativeQuery("select * from item where item.item_id=" + category.getId(), CategoryModel.class).list();
-		if(cat.size()>0)
-			session.save(cat);
+	List<CategoryModel> cat = session.createNativeQuery("select * from category where category.category_name = \'" + category.getName() +"\'", CategoryModel.class).list();
+		if(cat.size()==0)
+			session.save(category);
 		else
 			throw new IncorrectInputException("The name is not unique", new Exception());
 		
@@ -95,13 +95,15 @@ public class CategoryRepository {
 
 	public void editCategory(int id, String name, String description, Session session) throws IncorrectInputException {
 		
-		CategoryModel currentCategory = null;
+		CategoryModel currentCategory = new CategoryModel();
+		System.out.println(name);
 		try {
 			currentCategory = this.getACategory(id, session);
 		} catch (IncorrectInputException e) {
 			
 			throw e;
 		}
+		System.out.println(currentCategory.getName());
 		currentCategory.setName(name);
 		currentCategory.setDescription(description);
 		currentCategory.setLastUpdated(new Date());

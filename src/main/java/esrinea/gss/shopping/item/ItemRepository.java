@@ -45,7 +45,8 @@ public class ItemRepository {
 	 */
 	public void addItem(ItemModel item, Session session) throws IncorrectInputException {
 		
-		List<ItemModel> items = session.createNativeQuery("select * from item where item.name == " + item.getName()).list();
+		
+		List<ItemModel> items = session.createNativeQuery("select * from item where item.item_name = \'" + item.getName() + "\'").list();
 		if(items.size()>0)
 			throw new IncorrectInputException("Item name already exists", new Exception());
 		else
@@ -86,12 +87,12 @@ public class ItemRepository {
 
 		
 		try {
-			ItemModel currentItem = session.get(ItemModel.class, id);
+			ItemModel currentItem = this.getItem(id, session);
 			currentItem.setDeleted(true);
 			currentItem.setLastUpdated(new Date());
 			currentItem.setDeletedDate(new Date());
 			session.update(currentItem);
-			session.getTransaction().commit();
+			
 		} catch (Exception e) {
 			throw new ItemNotFoundException("The item", e);
 		} 
@@ -119,7 +120,7 @@ public class ItemRepository {
 	 */
 	public ItemModel getItem(int id, Session session) {
 		
-		session.beginTransaction();
+
 		ItemModel currentItem = null;
 		try {
 			currentItem = session

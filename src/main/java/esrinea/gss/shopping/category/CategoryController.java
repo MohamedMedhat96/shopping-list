@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * A controller interface that handles REST requests related to categories
  */
@@ -67,9 +69,9 @@ public class CategoryController {
 	 * @return JSON with success message and code
 	 */
 	@PutMapping("/category/{id}")
-	CategoryDTO editCategory(@PathVariable int id, @RequestBody Map<String, String> json) {
+	CategoryDTO editCategory(@PathVariable int id, @RequestBody ObjectNode json) {
 
-		return categoryService.editCategory(id, json.get("name"), json.get("description"));
+		return categoryService.editCategory(id, json.get("name").asText(), json.get("description").asText());
 
 	}
 

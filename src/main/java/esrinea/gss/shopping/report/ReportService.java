@@ -81,14 +81,11 @@ public class ReportService {
 			if (!stringEndDate.equals(""))
 				endDate = new SimpleDateFormat("dd-MM-yyyy").parse(stringEndDate);
 		} catch (ParseException e) {
+			session.close();
 			session.getTransaction().rollback();
 			throw new IncorrectInputException("The date format was not correct", e);
 		}
-		finally {
-			
-			session.close();
-			
-		}
+		
 		List<OperationModel> currentOperations = new ArrayList<OperationModel>();
 
 		try {
