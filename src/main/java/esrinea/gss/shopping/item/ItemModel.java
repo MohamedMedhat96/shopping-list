@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 
+import org.hibernate.envers.Audited;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -20,8 +22,11 @@ import esrinea.gss.shopping.category.CategoryModel;
 
 @JsonInclude(Include.NON_NULL)
 @Entity(name = "item")
+
 /** A Model class that repersents an Item*/
+@Audited
 public class ItemModel {
+	
 	@Id
 	@Column(name = "item_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

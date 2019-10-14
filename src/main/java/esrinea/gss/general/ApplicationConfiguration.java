@@ -75,9 +75,11 @@ public class ApplicationConfiguration {
 	Properties hibernateProperties() {
 		Properties properties = new Properties();
 		properties.setProperty("hibernate.ddl-auto", "update");
+		properties.setProperty("hibernate.hbm2ddl.auto", "update");
 		properties.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
 		properties.setProperty("hibernate.connection.pool_size", "10");
 		properties.setProperty("hibernate.show_sql", "true");
+		
 		return properties;
 	}
 }

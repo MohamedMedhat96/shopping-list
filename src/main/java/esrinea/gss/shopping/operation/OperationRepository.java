@@ -121,7 +121,7 @@ public class OperationRepository {
 	}
 
 	public List<OperationModel> getOperationsCustom(int itemId, int categoryId, Date startDate, Date endDate, Session session) {
-	
+		System.out.println(itemId + " " + categoryId + "  " + startDate + " " + endDate);
 		Criteria criteria = session.createCriteria(OperationModel.class, "o");
 		if (itemId != -1) {
 			System.out.println("test");
