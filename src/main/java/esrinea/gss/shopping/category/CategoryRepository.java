@@ -98,7 +98,13 @@ public class CategoryRepository {
 		CategoryModel currentCategory = new CategoryModel();
 		System.out.println(name);
 		try {
+			
 			currentCategory = this.getACategory(id, session);
+			
+						int size =session.createNativeQuery(
+								"select * from category where category.category_id != "+currentCategory.getId()+" and category.category_name = '" + name+"'").list().size();
+						if(size > 0)
+							throw new IncorrectInputException("Name has to be unique", new Exception());		
 		} catch (IncorrectInputException e) {
 			
 			throw e;

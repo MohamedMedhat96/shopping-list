@@ -24,9 +24,9 @@ import esrinea.gss.shopping.category.CategoryModel;
 @Entity(name = "item")
 
 /** A Model class that repersents an Item*/
-@Audited
+
 public class ItemModel {
-	
+	@Audited
 	@Id
 	@Column(name = "item_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,10 +43,13 @@ public class ItemModel {
 	@Column(name = "created_date")
 
 	private final Date dateCreated = new Date();
+	@Audited
 	@Column(name = "deleted")
 	private boolean deleted;
+	@Audited
 	@Column(name = "last_updated")
 	private Date lastUpdated;
+	@Audited
 	@Column(name = "deleted_date")
 	private Date deletedDate;
 

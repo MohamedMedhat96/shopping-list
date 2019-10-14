@@ -20,13 +20,14 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
 @Entity(name = "category")
-@Audited
-public class CategoryModel {
 
+public class CategoryModel {
+	@Audited
 	@Id
 	@Column(name = "category_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
+	
 	@NotEmpty(message = "Name Cannot be Empty")
 	@Column(name = "category_name", unique = true, nullable = false, length = 50)
 	private String name;
@@ -35,11 +36,14 @@ public class CategoryModel {
 	private String description;
 	@Column(name = "created_date")
 	private final Date dateCreated = new Date();
-
+	
+	@Audited
 	@Column(name = "deleted")
 	private boolean deleted = false;
+	@Audited
 	@Column(name = "last_updated")
 	private Date lastUpdated;
+	@Audited
 	@Column(name = "deleted_date")
 	private Date deletedDate;
 
